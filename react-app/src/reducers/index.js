@@ -1,5 +1,6 @@
 import weatherDataReducer from './weatherData';
 import weatherForecastReducer from './weatherForecast';
+import weatherWarningsReducer from './weatherWarnings';
 import {combineReducers} from 'redux';
 
 /**
@@ -7,7 +8,8 @@ import {combineReducers} from 'redux';
  */
 const allReducers = combineReducers({
     historicData: weatherDataReducer,
-    forecastData: weatherForecastReducer
+    forecastData: weatherForecastReducer,
+    warningData: weatherWarningsReducer
 });
 
 export default allReducers;

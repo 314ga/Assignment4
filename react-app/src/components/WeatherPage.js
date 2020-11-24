@@ -31,6 +31,7 @@ function WeatherPage() {
     //data reducers
     const historicData = useSelector(state => state.historicData);
     const forecastData = useSelector(state => state.forecastData);
+    const warningData = useSelector(state => state.warningData);
 
     /**
      * Function is called from the Filter Component(callback function)
@@ -48,6 +49,7 @@ function WeatherPage() {
     const onBtnChangeHandler = (city) => {
 
         //fix for toggle buttons calling onbuttonchangehandler twice
+        console.log(warningData.warnings);
         if (!debounce) {
             setSelectedCity(city);
             retrieveAllData(city, filterSet, selectedSDate, selectedEDate);
@@ -84,7 +86,11 @@ function WeatherPage() {
             <Accordion>
                 <Card className="myCard pt-3 mt-0">
                     <div className="row text-center mb-5">
-                        <div className="offset-md-3 col-md-3 text-center mb-2">
+                    <div className="col-md-3">
+
+                    <Accordion.Toggle as={Button} className="outline-link" eventKey="2">SEE WEATHER WARNINGS</Accordion.Toggle>
+                    </div>
+                        <div className="offset-md-1 col-md-3 text-center mb-2">
                             <Accordion.Toggle as={Button} className="outline-link " eventKey="0">SEE WEATHER FORECAST</Accordion.Toggle>
 
                         </div>
@@ -93,6 +99,7 @@ function WeatherPage() {
                             <Accordion.Toggle as={Button} className="outline-link" eventKey="1">SEE WEATHER HISTORY</Accordion.Toggle>
 
                         </div>
+                  
                     </div>
                     <Accordion.Collapse eventKey="0">
                         <Card.Body>
@@ -243,6 +250,17 @@ function WeatherPage() {
                             </Table >
                         </Card.Body>
                     </Accordion.Collapse>
+                </Card>
+                <Card>
+                <Accordion.Collapse eventKey="2">
+                    <Card.Body>
+                       
+                        <p className="text-center lead"> Showing Weather Warnings</p>
+
+
+                        
+                    </Card.Body>
+                </Accordion.Collapse>
                 </Card>
             </Accordion>
             <div>

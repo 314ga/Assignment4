@@ -25,3 +25,16 @@ export const resetForecastData = () =>
         type: 'RESETFORECAST'
     };
 };
+export const setWarningData = (data) =>
+{
+    return {
+        type: 'SETWARNING',
+        payload: data
+    };
+};
+export const resetWarningData = () =>
+{
+    return {
+        type: 'RESETWARNING'
+    };
+};

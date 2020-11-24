@@ -16,7 +16,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 function PostData() {
 
-    const historicData = useSelector(state => state.historicData);
     const [show, setShow] = useState(false);
     const [type, setType] = useState("temperature");
     const [unit, setUnit] = useState("°C");

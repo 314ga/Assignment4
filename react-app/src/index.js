@@ -7,12 +7,15 @@ import store from './store'
 import { Provider } from 'react-redux'
 import { retrieveHistoricData } from './reducers/weatherData'
 import { retrieveForecastData } from './reducers/weatherForecast';
+import { retrieveWarningData } from './reducers/weatherWarnings';
+
 
 /**
  * Getting default data from the server 
  */
 store.dispatch(retrieveHistoricData("data/Horsens", false, null, null));
 store.dispatch(retrieveForecastData("forecast/Horsens", false, null, null));
+store.dispatch(retrieveWarningData("warnings", false, null, null));
 
 ReactDOM.render(
   //added provider for react-redux
