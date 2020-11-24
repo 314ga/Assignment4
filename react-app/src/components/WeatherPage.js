@@ -278,7 +278,6 @@ function WeatherPage() {
                             {console.log(warningData.warnings)}
                                 {warningData.warnings === undefined ? "nothing to show" :
                                 warningData.warnings.map((warn, index) => {
-                                    <td>{warn.severity}</td>
                                     let str = "";
                                     console.log(warn);
                                     console.log(warn.severenity);
@@ -287,6 +286,7 @@ function WeatherPage() {
                                     console.log(item.type);
                                     if (item.type == 'precipitation') {
                                         return <tr key={index}>
+                                            <td>{warn.severity}</td>
                                             <td>{item.place}</td>
                                             <td>{item.type}</td>
                                             <td>{item.from}</td>
@@ -308,7 +308,9 @@ function WeatherPage() {
                                         </tr>
                                     }
                                     else if (item.type == 'wind speed') {
-                                        return <tr key={index}><td>{item.place}</td>
+                                        return <tr key={index}>
+                                            <td>{warn.severity}</td>
+                                            <td>{item.place}</td>
                                             <td>{item.type}</td>
                                             <td>{item.from}</td>
                                             <td>{item.to}</td>
@@ -329,6 +331,7 @@ function WeatherPage() {
                                     else
                                     
                                         return <tr key={index}><td>{item.place}</td>
+                                            <td>{warn.severity}</td>
                                             <td>{item.type}</td>
                                             <td>{item.from}</td>
                                             <td>{item.to}</td>
