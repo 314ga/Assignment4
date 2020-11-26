@@ -14,7 +14,7 @@ import WebSockets from './WebSockets';
 import { useState } from 'react';
 import Filter from './Filter';
 import { retrieveAllData } from '../utils/StoreHandler'
-
+import MyReactPolling from './MyReactPolling'
 //redux
 import { useSelector } from 'react-redux';
 
@@ -84,173 +84,12 @@ function WeatherPage() {
 
             </Jumbotron>
             <Accordion>
-                <Card className="myCard pt-3 mt-0">
-                    <div className="row text-center mb-5">
-                    <div className="col-md-3">
+                <div className="row text-center mb-5">
+                    <div className="col-md-5"><Accordion.Toggle as={Button} className="outline-link" eventKey="1">SEE WEATHER WARNINGS WITH SOCKETS</Accordion.Toggle></div>
+                    <div className="offset-md-2 col-md-5 text-center mb-2"><Accordion.Toggle as={Button} className="outline-link " eventKey="0">SEE WEATHER WARNINGS WITH POLLING</Accordion.Toggle></div>
 
-                    <Accordion.Toggle as={Button} className="outline-link" eventKey="2">SEE WEATHER WARNINGS</Accordion.Toggle>
-                    </div>
-                        <div className="offset-md-1 col-md-3 text-center mb-2">
-                            <Accordion.Toggle as={Button} className="outline-link " eventKey="0">SEE WEATHER FORECAST</Accordion.Toggle>
-
-                        </div>
-                        <div className="col-md-3">
-
-                            <Accordion.Toggle as={Button} className="outline-link" eventKey="1">SEE WEATHER HISTORY</Accordion.Toggle>
-
-                        </div>
-                  
-                    </div>
-                    <Accordion.Collapse eventKey="0">
-                        <Card.Body>
-                            <p className="text-center lead"> Weather Forecast For {selectedCity}</p>
-                            <Table id="weatherForecast" responsive striped bordered hover >
-                                <thead className="text-center">
-                                    <tr>
-                                        <th>Place</th>
-                                        <th>Type</th>
-                                        <th>From</th>
-                                        <th>To</th>
-                                        <th>Unit</th>
-                                        <th>time</th>
-                                        <th>Precipitation Type</th>
-                                        <th>Wind Direction</th>
-
-                                    </tr>
-                                </thead>
-                                <tbody className="text-center">
-                                    {forecastData.map((item, index) => {
-                                        if (item.type == 'precipitation') {
-                                            let precTypes = item.precipitation_types;
-                                            let str = "";
-                                            precTypes.forEach(x => {
-                                                if (x == "") {
-                                                    str = x;
-                                                }
-                                                else {
-                                                    str += " " + x + ", ";
-                                                }
-                                            })
-                                            return <tr key={index}>
-                                                <td>{item.place}</td>
-                                                <td>{item.type}</td>
-                                                <td>{item.from}</td>
-                                                <td>{item.to}</td>
-                                                <td>{item.unit}</td>
-                                                <td>{item.time}</td>
-                                                <td>{str}</td>
-                                                <td>-</td>
-
-                                            </tr>
-                                        }
-                                        else if (item.type == 'wind speed') {
-                                            let windDir = item.directions;
-                                            let str1 = "";
-                                            windDir.forEach(x => {
-                                                if (x == "") {
-                                                    str1 = x;
-                                                }
-                                                else {
-                                                    str1 += " " + x + ", ";
-                                                }
-                                            })
-                                            return <tr key={index}>
-                                                <td>{item.place}</td>
-                                                <td>{item.type}</td>
-                                                <td>{item.from}</td>
-                                                <td>{item.to}</td>
-                                                <td>{item.unit}</td>
-                                                <td>{item.time}</td>
-                                                <td>-</td>
-                                                <td>{str1}</td>
-
-                                            </tr>
-                                        }
-                                        else
-                                            return <tr key={index}>
-                                                <td>{item.place}</td>
-                                                <td>{item.type}</td>
-                                                <td>{item.from}</td>
-                                                <td>{item.to}</td>
-                                                <td>{item.unit}</td>
-                                                <td>{item.time}</td>
-                                                <td>-</td>
-                                                <td>-</td>
-
-                                            </tr>
-                                    })}
-
-
-                                </tbody>
-                            </Table></Card.Body>
-                    </Accordion.Collapse>
-                </Card>
-                <Card>
-
-                    <Accordion.Collapse eventKey="1">
-                        <Card.Body>
-                            <p className="text-center lead"> Showing Weather History For {selectedCity}</p>
-
-
-                            <Table id="weatherHistory" responsive striped bordered hover>
-                                <thead className="text-center">
-                                    <tr>
-                                        <th>Place</th>
-                                        <th>Type</th>
-                                        <th>Value</th>
-                                        <th>Unit</th>
-                                        <th>time</th>
-                                        <th>Precipitation Type</th>
-                                        <th>Wind Direction</th>
-
-                                    </tr>
-
-                                </thead>
-                                <tbody className="text-center">
-                                    {historicData.map((item, index) => {
-                                        if (item.type == 'precipitation') {
-                                            return <tr key={index}>
-                                                <td>{item.place}</td>
-                                                <td>{item.type}</td>
-                                                <td>{item.value}</td>
-                                                <td>{item.unit}</td>
-                                                <td>{item.time}</td>
-                                                <td>{item.precipitation_type}</td>
-                                                <td>-</td>
-
-                                            </tr>
-                                        }
-                                        else if (item.type == 'wind speed') {
-                                            return <tr key={index}>
-                                                <td>{item.place}</td>
-                                                <td>{item.type}</td>
-                                                <td>{item.value}</td>
-                                                <td>{item.unit}</td>
-                                                <td>{item.time}</td>
-                                                <td>-</td>
-                                                <td>{item.direction}</td>
-
-                                            </tr>
-                                        }
-                                        else
-                                            return <tr key={index}>
-                                                <td>{item.place}</td>
-                                                <td>{item.type}</td>
-                                                <td>{item.value}</td>
-                                                <td>{item.unit}</td>
-                                                <td>{item.time}</td>
-                                                <td>-</td>
-                                                <td>-</td>
-
-                                            </tr>
-                                    })}
-
-
-                                </tbody>
-                            </Table >
-                        </Card.Body>
-                    </Accordion.Collapse>
-                </Card>
+                </div>
+                <MyReactPolling />
                 <WebSockets />
             </Accordion>
             <div>

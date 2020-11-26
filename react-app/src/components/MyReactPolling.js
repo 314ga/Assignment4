@@ -1,6 +1,6 @@
-import React from 'react';
-//redux
-//bootstrap imports
+
+import axios from "axios";
+import ReactPolling from 'react-polling'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Table from 'react-bootstrap/Table'
 import Accordion from 'react-bootstrap/Accordion'
@@ -15,91 +15,62 @@ import ToggleButton from 'react-bootstrap/ToggleButton'
 import InputGroup from 'react-bootstrap/InputGroup'
 import Button from 'react-bootstrap/Button'
 import FormControl from 'react-bootstrap/FormControl'
-var ws = null;
+const fetchWarningData = (url) => {
+    let response = axios.get('http://localhost:8080/warnings');
+    return response;
+}
+
 let initData = true;
 let severityChange = 0;
 let severityNumber = 0;
-function WebSockets() {
+
+//redux
+function MyReactPolling() {
 
     const warningData = useSelector(state => state.warningData);
-    const open = () => {
-        if (!ws) {
-            ws = new WebSocket("ws://localhost:8090/warnings");
-            ws.onopen = onOpen;
-            ws.onclose = onClose;
-            ws.onmessage = onMessage;
-            ws.onerror = onError;
-            console.log('OPENING ...');
-        }
-    }
-    const close = () => {
-        if (ws) {
-            console.log('CLOSING ...');
-            ws.close();
-        }
-        console.log('CLOSED');
-    }
-    var onOpen = function () {
-        console.log("OPENED:");
-        ws.send("subscribe");
-    };
 
-    var onClose = function () {
-        console.log("CLOSED:");
-        ws = null;
-        initData = true;
-    };
-
-    var onMessage = function (event) {
-        let response = JSON.parse(event.data);
-        // console.log("Init Data" + initData);
+    function initialWarningData(data) {
         if (initData) {
             initData = false;
             // console.log("dispatching");
             //remove null rpediction from response
-            let filteredWarnings = response.warnings.filter(x => x.prediction != null);
+            let filteredWarnings = data.warnings.filter(x => x.prediction != null);
             //  console.log(filteredWarnings);
-            response.warnings = filteredWarnings;
-            store.dispatch(setWarningData(response));
+            data.warnings = filteredWarnings;
+            store.dispatch(setWarningData(data));
         }
         else {
             // newWarning.next(response);
             //console.log(response);
             let currentData = store.getState().warningData.warnings;
             // console.log(currentData);
-            const initWarnings = of(response);
+            const initWarnings = of(data.warnings);
+            //remove existing data from store with id matching new data from server
             const merged = merge(initWarnings.pipe(
                 mergeMap(val => from(currentData).pipe(
                     filter(x => x.id != val.id)
-                ))), initWarnings.pipe(
-                    filter(remove => remove.prediction != null))).pipe(
-                        filter(all => all.severity >= severityNumber),
-                        toArray());
+                ))),
+                // remove predictions with null values
+                initWarnings.pipe(
+                    filter(remove => remove.prediction != null)))
+                //check the severity value and return warnings with severity >= user input
+                .pipe(
+                    filter(all => all.severity >= severityNumber),
+                    toArray());
+
 
             merged.subscribe(changedWarnings => {
                 updateData(changedWarnings);
+
                 //  console.log(changedWarnings);
             });
 
         }
-    };
-
-    const updateData = (data) => {
-        //need to ssgine new object so redux notice change
-        let newData = Object.assign({}, store.getState().warningData);
-        newData.warnings = data;
-        store.dispatch(setWarningData(newData));
-    };
-    var onError = function (event) {
-        alert(event.data);
+        console.log(data);
+        store.dispatch(setWarningData(data));
     }
-    open();
-
     const onReceiveWarningChange = (state) => {
-        if (state)
-            open();
-        else
-            close();
+
     }
     const onSeverityButton = () => {
         severityNumber = severityChange;
@@ -107,9 +78,35 @@ function WebSockets() {
     const onSeverityChange = (event) => {
         severityChange = event.target.value;
     }
-
     return (
+
         <>
+            <ReactPolling
+                url={'http://localhost:8080/warnings'}
+                interval={5000} // in milliseconds(ms)
+                retryCount={3} // this is optional
+                onSuccess={resp => {
+                    initialWarningData(resp.data);
+                    return true;
+                }}
+                onFailure={() => console.log('handle failure')} // this is optional
+                promise={fetchWarningData} // custom api calling function that should return a promise
+                render={({ startPolling, stopPolling, isPolling }) => {
+                    if (isPolling) {
+                        return (
+                            <div>
+                                <p>Hello I am polling</p>
+                                <button onClick={stopPolling}>Stop Polling</button></div>
+                        );
+                    } else {
+                        return (
+                            <div> Hello I stopped polling
+                                <button onClick={startPolling}>Start Polling</button>
+                            </div>
+                        );
+                    }
+                }}
+            />
             <ToggleButtonGroup type="radio" name="options" defaultValue={0}>
                 <ToggleButton variant="info" value={0} onClick={() => onReceiveWarningChange(true)}>On Life Update</ToggleButton>
                 <ToggleButton variant="info" value={1} onClick={() => onReceiveWarningChange(false)}>Off Life Update</ToggleButton>
@@ -126,7 +123,7 @@ function WebSockets() {
             </InputGroup>
             <Button variant="dark" onClick={() => onSeverityButton()}>Change Severity</Button>{' '}
             <Card>
-                <Accordion.Collapse eventKey="1">
+                <Accordion.Collapse eventKey="0">
                     <Card.Body>
 
                         <p className="text-center lead"> Showing Weather Warnings</p>
@@ -217,8 +214,10 @@ function WebSockets() {
                 </Accordion.Collapse>
             </Card>
         </>
+
+
     );
 
 
 }
-export default WebSockets;
+export default MyReactPolling;
