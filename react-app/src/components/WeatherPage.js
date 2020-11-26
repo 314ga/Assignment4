@@ -10,6 +10,7 @@ import ToggleButton from 'react-bootstrap/ToggleButton'
 
 //variable imports
 import PostData from './PostData';
+import WebSockets from './WebSockets';
 import { useState } from 'react';
 import Filter from './Filter';
 import { retrieveAllData } from '../utils/StoreHandler'
@@ -31,7 +32,7 @@ function WeatherPage() {
     //data reducers
     const historicData = useSelector(state => state.historicData);
     const forecastData = useSelector(state => state.forecastData);
-    const warningData = useSelector(state => state.warningData);
+
 
     /**
      * Function is called from the Filter Component(callback function)
@@ -250,103 +251,7 @@ function WeatherPage() {
                         </Card.Body>
                     </Accordion.Collapse>
                 </Card>
-                <Card>
-                <Accordion.Collapse eventKey="2">
-                    <Card.Body>
-                       
-                        <p className="text-center lead"> Showing Weather Warnings</p>
-
-
-                        <Table id="weatherWarnings" responsive striped bordered hover>
-                            <thead className="text-center">
-                                <tr>
-                                    <th>Severity</th>
-                                    <th>Place</th>
-                                    <th>Type</th>
-                                    <th>From</th>
-                                    <th>To</th>
-                                    <th>Wind Directions</th>
-                                    <th>Precipitaiton Type</th>
-                                    <th>Unit</th>
-                                    <th>Time</th>
-
-                                </tr>
-
-                            </thead>
-                            <tbody className="text-center">
-                            {console.log(warningData)}
-                            {console.log(warningData.warnings)}
-                                {warningData.warnings === undefined ? "nothing to show" :
-                                warningData.warnings.map((warn, index) => {
-                                    let str = "";
-                                    console.log(warn);
-                                    console.log(warn.severenity);
-                                    console.log(warn.prediction);
-                                    let item = warn.prediction;
-                                    console.log(item.type);
-                                    if (item.type == 'precipitation') {
-                                        return <tr key={index}>
-                                            <td>{warn.severity}</td>
-                                            <td>{item.place}</td>
-                                            <td>{item.type}</td>
-                                            <td>{item.from}</td>
-                                            <td>{item.to}</td>
-                                            <td>-</td>                                                
-                                            {
-                                            item.precipitation_types.forEach(x => {
-                                                if (x == "") {
-                                                    str = x;
-                                                }
-                                                else {
-                                                    str += " " + x + ", ";
-                                                }
-                                            })}
-                                            <td>{str}</td>
-                                            <td>{item.unit}</td>
-                                            <td>{item.time}</td>
-                                            
-                                        </tr>
-                                    }
-                                    else if (item.type == 'wind speed') {
-                                        return <tr key={index}>
-                                            <td>{warn.severity}</td>
-                                            <td>{item.place}</td>
-                                            <td>{item.type}</td>
-                                            <td>{item.from}</td>
-                                            <td>{item.to}</td>
-                                            {
-                                            item.directions.forEach(x => {
-                                                if (x == "") {
-                                                    str = x;
-                                                }
-                                                else {
-                                                    str += " " + x + ",";
-                                                }
-                                            })}
-                                            <td>{str}</td>
-                                            <td>-</td>
-                                            <td>{item.unit}</td>
-                                            <td>{item.time}</td></tr>
-                                    }
-                                    else
-                                    
-                                        return <tr key={index}><td>{item.place}</td>
-                                            <td>{warn.severity}</td>
-                                            <td>{item.type}</td>
-                                            <td>{item.from}</td>
-                                            <td>{item.to}</td>
-                                            <td>-</td>
-                                            <td>-</td>
-                                            <td>{item.unit}</td>
-                                            <td>{item.time}</td></tr>
-                                    })}
-
-
-                            </tbody>
-                            </Table>
-                    </Card.Body>
-                </Accordion.Collapse>
-                </Card>
+                <WebSockets />
             </Accordion>
             <div>
 
