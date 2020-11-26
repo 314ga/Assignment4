@@ -14,8 +14,15 @@ import { webSocket } from "rxjs/webSocket";
 import store from '../store'
 import { useSelector } from 'react-redux';
 import {setWarningData} from '../actions';
+import ToggleButtonGroup from 'react-bootstrap/ToggleButtonGroup'
+import ToggleButton from 'react-bootstrap/ToggleButton'
+import InputGroup from 'react-bootstrap/InputGroup'
+import Button from 'react-bootstrap/Button'
+import FormControl from 'react-bootstrap/FormControl'
 var ws = null;
 let initData = true;
+let severityChange = 0;
+let severityNumber = 0;
 function WebSockets() {
        
         const warningData = useSelector(state => state.warningData);
@@ -30,7 +37,6 @@ function WebSockets() {
             console.log('OPENING ...');
         }
         }
-        
         const close = () =>  {
             if (ws) {
                 console.log('CLOSING ...');
@@ -46,6 +52,7 @@ function WebSockets() {
         var onClose = function() {
             console.log("CLOSED:");
             ws = null;
+            initData = true;
         };
         
         var onMessage = function(event) 
@@ -56,6 +63,10 @@ function WebSockets() {
         {
             initData = false;
             console.log("dispatching");
+            //remove null rpediction from response
+            let filteredWarnings = response.warnings.filter(x => x.prediction != null);
+            console.log(filteredWarnings);
+            response.warnings = filteredWarnings;
             store.dispatch(setWarningData(response));
         }
         else
@@ -65,40 +76,26 @@ function WebSockets() {
            let currentData = store.getState().warningData.warnings;
            console.log(currentData);
             const initWarnings = of(response);
-            const newWarnings = from(currentData);
-            const filtered = initWarnings.pipe(
-                mergeMap(val => from(currentData).pipe(
-                    filter(x => x.id != val.id)
-                ))
-            );
             const merged = merge(initWarnings.pipe(
                 mergeMap(val => from(currentData).pipe(
                     filter(x => x.id != val.id)
-                ))
-               
-            ),initWarnings.pipe(
-                filter(remove => remove.prediction != null)
-            )).pipe(
-                toArray()
-            );
-           /* const result = initWarnings.pipe
-            (
-                mergeMap(val => from(currentData))
-            )*/
-            merged.subscribe(changedWarnings => 
+                ))),initWarnings.pipe(
+                filter(remove => remove.prediction != null))).pipe(
+                    filter(all => all.severity >= severityNumber),
+                    toArray());
+            
+            
+                merged.subscribe(changedWarnings => 
                 { 
                     updateData(changedWarnings);
                     console.log(changedWarnings);
                 });
-               /* filtered.subscribe(changedWarnings => 
-                    { 
-                        console.log(changedWarnings);
-                    });*/
                 
         }};
         
         const updateData = (data) =>{
-            let newData =  store.getState().warningData;
+            //need to ssgine new object so redux notice change
+            let newData = Object.assign({},store.getState().warningData);
             newData.warnings = data;
             store.dispatch(setWarningData(newData));
         };
@@ -107,9 +104,39 @@ function WebSockets() {
         }
         open();
       
+        const onReceiveWarningChange = (state) => 
+        {
+            if(state)
+                open();
+            else
+                close();
+        }
+        const onSeverityButton = () => 
+        {
+            severityNumber = severityChange;
+        }
+        const onSeverityChange = (event) => 
+        {
+            severityChange = event.target.value;
+        }
          
     return (
         <>
+          <ToggleButtonGroup type="radio" name="options" defaultValue={0}>
+                            <ToggleButton variant="info" value={0} onClick={() => onReceiveWarningChange(true)}>On Life Update</ToggleButton>
+                            <ToggleButton variant="info" value={1} onClick={() => onReceiveWarningChange(false)}>Off Life Update</ToggleButton>
+          </ToggleButtonGroup>
+          <InputGroup className="mb-3" onChange={onSeverityChange}>
+                <FormControl
+                placeholder="Severity"
+                aria-label="Severity"
+                aria-describedby="basic-addon2"
+                />
+                <InputGroup.Append>
+                <InputGroup.Text id="basic-addon2">Severity(1-10)</InputGroup.Text>
+                </InputGroup.Append>
+          </InputGroup>
+          <Button variant="dark" onClick={() => onSeverityButton()}>Change Severity</Button>{' '}
               <Card>
                 <Accordion.Collapse eventKey="2">
                     <Card.Body>
