@@ -21,6 +21,38 @@ let severityChange = 0;
 let severityNumber = 0;
 function WebSockets() {
 
+    //ALTERNATIVE PROPER SOLUTION NOT WORKING-NEEDS LOGIC FOR GETTING ARRAY AFTER TIME, slo
+    //close subscription to get array or idk
+    // let resultObservable = merge(newWarnings.pipe(
+    //     mergeMap(val => from(store.getState().warningData.warnings).pipe(
+    //         filter(x => x.id != val.id)
+    //     ))), newWarnings.pipe(
+    //         filter(remove => remove.prediction != null))).pipe(
+    //             filter(all => all.severity >= severityNumber),
+    //             scan((acc, curr) => acc[acc.length] = curr, [])
+    //         );
+    // let resultObservable = merge(newWarnings.pipe(
+    //     mergeMap(val => from(store.getState().warningData.warnings).pipe(
+    //         filter(x => x.id != val.id)
+    //     ))), newWarnings.pipe(
+    //         filter(remove => remove.prediction != null))).pipe(
+    //             filter(all => all.severity >= severityNumber),
+    //         );
+    //newWarnings.next(response);
+    // subscription = resultObservable.subscribe(
+    //     response => {
+    //         // updateData(changedWarnings);
+    //         console.log("-");
+    //         console.log(response);
+    //     },
+    //     err => {
+    //         console.log(err);
+    //         //closeLoadingBar();
+    //     },
+    //     () => {
+    //         console.log("completed");
+    //     });
+
     const warningData = useSelector(state => state.warningData);
     const open = () => {
         if (!ws) {
@@ -110,11 +142,12 @@ function WebSockets() {
 
     return (
         <>
+            <h2>Socket controls</h2>
             <ToggleButtonGroup type="radio" name="options" defaultValue={0}>
-                <ToggleButton variant="info" value={0} onClick={() => onReceiveWarningChange(true)}>On Life Update</ToggleButton>
-                <ToggleButton variant="info" value={1} onClick={() => onReceiveWarningChange(false)}>Off Life Update</ToggleButton>
+                <ToggleButton variant="dark" value={0} onClick={() => onReceiveWarningChange(true)}>On Life Update</ToggleButton>
+                <ToggleButton variant="dark" value={1} onClick={() => onReceiveWarningChange(false)}>Off Life Update</ToggleButton>
             </ToggleButtonGroup>
-            <InputGroup className="mb-3" onChange={onSeverityChange}>
+            <InputGroup className="mb-5" onChange={onSeverityChange}>
                 <FormControl
                     placeholder="Severity"
                     aria-label="Severity"
@@ -122,9 +155,11 @@ function WebSockets() {
                 />
                 <InputGroup.Append>
                     <InputGroup.Text id="basic-addon2">Severity(1-10)</InputGroup.Text>
+
                 </InputGroup.Append>
+                <Button variant="dark" onClick={() => onSeverityButton()}>Change Severity</Button>{' '}
             </InputGroup>
-            <Button variant="dark" onClick={() => onSeverityButton()}>Change Severity</Button>{' '}
+
             <Card>
                 <Accordion.Collapse eventKey="1">
                     <Card.Body>

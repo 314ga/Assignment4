@@ -8,7 +8,7 @@ import { Provider } from 'react-redux'
 import { retrieveHistoricData } from './reducers/weatherData'
 import { retrieveForecastData } from './reducers/weatherForecast';
 import { retrieveWarningData } from './reducers/weatherWarnings';
-
+import { retrieveWarningPollingData } from './reducers/weatherWarningsPolling'
 
 /**
  * Getting default data from the server 
@@ -16,10 +16,10 @@ import { retrieveWarningData } from './reducers/weatherWarnings';
 store.dispatch(retrieveHistoricData("data/Horsens", false, null, null));
 store.dispatch(retrieveForecastData("forecast/Horsens", false, null, null));
 store.dispatch(retrieveWarningData("warnings", false, null, null));
-
+store.dispatch(retrieveWarningPollingData("warnings", false, null, null));
 ReactDOM.render(
   //added provider for react-redux
-  <Provider store = {store}>
+  <Provider store={store}>
     <React.StrictMode>
       <App />
     </React.StrictMode>

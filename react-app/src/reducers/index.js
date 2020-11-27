@@ -1,7 +1,8 @@
 import weatherDataReducer from './weatherData';
 import weatherForecastReducer from './weatherForecast';
 import weatherWarningsReducer from './weatherWarnings';
-import {combineReducers} from 'redux';
+import weatherWarningsPollingReducer from './weatherWarningsPolling'
+import { combineReducers } from 'redux';
 
 /**
  * this class is merging all reducers into one reducer
@@ -9,7 +10,8 @@ import {combineReducers} from 'redux';
 const allReducers = combineReducers({
     historicData: weatherDataReducer,
     forecastData: weatherForecastReducer,
-    warningData: weatherWarningsReducer
+    warningData: weatherWarningsReducer,
+    warningPollingData: weatherWarningsPollingReducer
 });
 
 export default allReducers;
